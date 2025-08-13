@@ -3,7 +3,7 @@ name: Hello World JS Pipeline
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   say-hello:
