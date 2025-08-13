@@ -67,6 +67,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Set up Node.js for running tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Run automated tests
+      - name: Run tests
+        run: npm test
+
       # Log in to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -74,19 +88,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build Docker image (with tests included)
+      # Build Docker image
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/hello-world-js:latest .
-
-      # Run tests inside Docker container
-      - name: Run tests inside container
-        run: docker run --rm ${{ secrets.DOCKERHUB_USERNAME }}/hello-world-js:latest npm test
 
       # List Docker images (for verification)
       - name: List Docker images
         run: docker images
 
-      # Push Docker image to Docker Hub (only if tests pass)
+      # Push Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/hello-world-js:latest
-      
