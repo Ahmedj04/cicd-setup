@@ -1,141 +1,103 @@
-## cicd-test
+# Hello World JS Application
 
-Simple Node.js app that prints "Hello, World" and includes a Mocha test and a Dockerfile.
+This is a simple Node.js application that prints **Hello, World** and includes a CI/CD pipeline using **GitHub Actions** and **Docker**.
 
-### Requirements
+---
 
-- Node.js 18+ (tested with Node 20)
-- npm 9+
-- Docker (optional, for containerized runs)
+## 🚀 Running the Application Locally
 
-### Setup
+### 1. Clone the repository
 
-1. Clone the repository
-   
-   ```bash
-   git clone <your-repo-url>
-   cd cicd-test
-   ```
-2. Install dependencies
-   
-   ```bash
-   npm ci
-   ```
-
-### Run locally
-
-- Run the app:
-  
-  ```bash
-  node main.js
-  ```
-  Expected output: `Hello, World`
-
-- Run tests:
-  
-  ```bash
-  npm test
-  ```
-
-### Run with Docker
-
-1. Build the image
-   
-   ```bash
-   docker build -t cicd-test:local .
-   ```
-2. Run the container
-   
-   ```bash
-   docker run --rm cicd-test:local
-   ```
-
-### How the pipeline works
-
-This project is CI-friendly and can be validated with a simple pipeline that:
-
-1. Checks out the code
-2. Sets up Node.js
-3. Installs dependencies with `npm ci`
-4. Runs tests with `npm test`
-5. (Optional) Builds and pushes a Docker image on main merges
-
-Below is an example GitHub Actions workflow you can drop into `.github/workflows/ci.yml`:
-
-```yaml
-name: CI
-
-on:
-  push:
-    branches: ["**"]
-  pull_request:
-    branches: ["**"]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install
-        run: npm ci
-
-      - name: Test
-        run: npm test
-
-  docker:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # Authenticate to your registry (example: GitHub Container Registry)
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/${{ github.repository }}/cicd-test:latest
+```bash
+git clone <repository_url>
+cd <repository_name>
 ```
 
-### Additional setup for CI/CD
+### 2. Install dependencies
 
-- If using a different container registry (e.g., Docker Hub), replace the login step and `tags` accordingly and add secrets in your repo settings:
-  - `REGISTRY_USERNAME`
-  - `REGISTRY_PASSWORD`
-  - Update `registry`, `username`, and `password` in the login step
+```bash
+npm install
+```
 
-- For private registries, ensure network access from the CI runners and correct credentials.
+### 3. Run the application
 
-- No environment variables are required by the app itself.
+```bash
+node main.js
+```
 
-### Project structure
+You should see the following output:
 
-- `main.js`: App entry; prints "Hello, World" and exports `getMessage`.
-- `test.js`: Mocha test ensuring the message is correct.
-- `dockerfile`: Minimal Node 20-alpine image to run `main.js`.
-- `package.json`: Defines the `test` script and dev dependency on Mocha.
+```
+Hello, World
+```
 
+### 4. Run tests
 
+```bash
+npm test
+```
+
+---
+
+## ⚙️ CI/CD Pipeline Workflow
+
+This repository includes a **GitHub Actions** workflow defined in `.github/workflows/cicd.yml`.
+
+The pipeline has **two jobs**:
+
+### **1. Test Job**
+
+* Checks out the repository.
+* Sets up Node.js (version 20).
+* Installs dependencies using `npm ci` (ensures clean installation).
+* Runs automated tests using `npm test`.
+
+### **2. Build & Push Job**
+
+* Runs **only if the test job passes**.
+* Logs in to Docker Hub using secrets.
+* Builds the Docker image using the provided `Dockerfile`.
+* Pushes the image to Docker Hub.
+
+---
+
+## 🛠 Setup Instructions
+
+### **1. Environment Requirements**
+
+* Node.js (v20 or above)
+* npm
+* Docker
+
+### **2. Docker Setup**
+
+If you want to run the application inside Docker:
+
+```bash
+docker build -t hello-world-js .
+docker run --rm hello-world-js
+```
+
+### **3. GitHub Secrets Configuration**
+
+In your GitHub repository settings, add the following secrets:
+
+* `DOCKERHUB_USERNAME` – Your Docker Hub username.
+* `DOCKERHUB_TOKEN` – Your Docker Hub access token.
+
+---
+
+## 📦 Dockerfile
+
+```dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY . .
+CMD ["node", "main.js"]
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
