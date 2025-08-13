@@ -1,4 +1,4 @@
-name: Hello World JS Pipeline
+name: CICD TEST Workflow
 
 on:
   push:
