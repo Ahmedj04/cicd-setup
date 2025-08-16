@@ -74,8 +74,8 @@ The pipeline has **two jobs**:
 If you want to run the application inside Docker:
 
 ```bash
-docker build -t hello-world-js .
-docker run --rm hello-world-js
+docker pull yourusername/hello-world-js:latest
+docker run --rm yourusername/hello-world-js:latest
 ```
 
 ### **3. GitHub Secrets Configuration**
